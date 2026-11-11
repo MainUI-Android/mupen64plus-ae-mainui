@@ -33,6 +33,18 @@ final class MainUIStates implements MainUIStateApi.Emulator {
     @Override
     public int slotCount() { return service.getSlotQuantity(); }
 
+    @Override
+    public boolean pause() {
+        if (!isRunning()) return false;
+        service.pauseEmulator();
+        return service.isPaused();
+    }
+
+    @Override
+    public void resume() {
+        if (service.isPaused()) service.resumeEmulator();
+    }
+
     private File resumeFile() {
         return new File(service.mainuiGamePrefs().getUserSaveDir(), "MainUI/resume.st");
     }
