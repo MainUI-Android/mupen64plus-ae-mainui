@@ -67,6 +67,19 @@
         tools:ignore="UnusedAttribute"
         android:fullBackupContent="@xml/backup_descriptor">
 
+        <!-- MainUI State API: MainUI (a frontend) saves and loads states with broadcasts. In the
+             emulation process, where the game runs. -->
+        <meta-data android:name="io.github.mainui.STATE_API" android:value="1" />
+        <receiver
+            android:name="io.github.mainui.stateapi.MainUIStateApi$Receiver"
+            android:exported="true"
+            android:process=":EmulationProcess"
+            tools:ignore="ExportedReceiver">
+            <intent-filter>
+                <action android:name="io.github.mainui.stateapi.COMMAND" />
+            </intent-filter>
+        </receiver>
+
         <activity
             android:name="paulscode.android.mupen64plusae.SplashActivity"
             android:label="@string/SplashActivity_title"

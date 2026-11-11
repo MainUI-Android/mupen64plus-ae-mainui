@@ -22,6 +22,8 @@ android {
 
     defaultConfig {
         applicationId = "org.mupen64plusae.v3.alpha"
+        // MainUI-Android build: installs beside the official app (CI sets the version).
+        applicationIdSuffix = ".mainui"
     }
     buildTypes {
         release {

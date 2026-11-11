@@ -6,7 +6,7 @@ android {
     defaultConfig {
         minSdkVersion 28
         targetSdkVersion 36
-        versionCode = 249
-        versionName = "3.0.249 (beta)"
+        versionCode = (System.getenv("MAINUI_VERSION_CODE") ?: "249").toInteger()
+        versionName = System.getenv("MAINUI_VERSION_NAME") ?: "3.0.249 (beta)"
     }
 }

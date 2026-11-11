@@ -490,6 +490,11 @@ public class CoreService extends Service implements CoreInterface.OnFpsChangedLi
         return mCoreInterface.emuGetState();
     }
 
+    // MainUI State API (MainUIStates)
+    private final MainUIStates mMainUiStates = new MainUIStates(this);
+    CoreInterface mainuiCore() { return mCoreInterface; }
+    GamePrefs mainuiGamePrefs() { return mGamePrefs; }
+
     PixelBuffer.SurfaceTextureWithSize getSurfaceTexture() {
         return mPixelBuffer.getSurfaceTexture();
     }
@@ -745,6 +750,9 @@ public class CoreService extends Service implements CoreInterface.OnFpsChangedLi
                         RetroAchievementsManager.loadProgress(latestSave);
                         mCoreInterface.emuLoadFile(latestSave);
                     }
+
+                    // MainUI State API: MainUI (a frontend) saves and loads this game's states.
+                    io.github.mainui.stateapi.MainUIStateApi.attach(mMainUiStates);
 
                     // This call blocks until emulation is stopped
                     mCoreInterface.emuStart();
@@ -1105,6 +1113,7 @@ public class CoreService extends Service implements CoreInterface.OnFpsChangedLi
     public void onDestroy()
     {
         Log.i(TAG, "onDestroy");
+        io.github.mainui.stateapi.MainUIStateApi.detach(mMainUiStates);
 
         // Unregister since the activity is about to be closed.
         unregisterReceiver(mMessageReceiver);
