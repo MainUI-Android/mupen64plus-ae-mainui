@@ -26,7 +26,9 @@ concurrency:
 env:
   UPSTREAM_REPO: mupen64plus-ae/mupen64plus-ae
   UPSTREAM_BRANCH: master
-  STABLE_TAG_REGEX: '^v[0-9]+(\.[0-9]+)+$'
+  # Releases after v3.0.246 (November 2020, Gradle 6.5): until upstream publishes a newer one,
+  # MainUI installs the nightly, which is upstream's current code.
+  STABLE_TAG_REGEX: '^v(3\.0\.(24[7-9]|2[5-9][0-9]|[3-9][0-9]{2}|[1-9][0-9]{3,})|3\.[1-9][0-9]*\.[0-9]+|([4-9]|[1-9][0-9]+)(\.[0-9]+)+)$'
   GH_TOKEN: ${{ github.token }}
   APK_NAME: mupen64plus-ae-mainui
 

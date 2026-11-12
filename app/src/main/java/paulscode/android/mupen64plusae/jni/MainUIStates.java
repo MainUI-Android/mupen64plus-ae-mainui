@@ -33,15 +33,22 @@ final class MainUIStates implements MainUIStateApi.Emulator {
     @Override
     public int slotCount() { return service.getSlotQuantity(); }
 
+    /** MainUI's pause took effect (not one the user or the in-game drawer holds). */
+    private volatile boolean pausedByMainUi;
+
     @Override
     public boolean pause() {
         if (!isRunning()) return false;
+        if (service.isPaused()) return true;
         service.pauseEmulator();
-        return service.isPaused();
+        pausedByMainUi = service.isPaused();
+        return pausedByMainUi;
     }
 
     @Override
     public void resume() {
+        if (!pausedByMainUi) return;
+        pausedByMainUi = false;
         if (service.isPaused()) service.resumeEmulator();
     }
 
