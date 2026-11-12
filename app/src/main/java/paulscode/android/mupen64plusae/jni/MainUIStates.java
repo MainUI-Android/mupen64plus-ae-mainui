@@ -52,6 +52,18 @@ final class MainUIStates implements MainUIStateApi.Emulator {
         if (service.isPaused()) service.resumeEmulator();
     }
 
+    @Override
+    public boolean liftOwnPause() {
+        if (pausedByMainUi || !isRunning() || !service.isPaused()) return false;
+        service.resumeEmulator();
+        return true;
+    }
+
+    @Override
+    public void restoreOwnPause() {
+        if (isRunning() && !service.isPaused()) service.pauseEmulator();
+    }
+
     private File resumeFile() {
         return new File(service.mainuiGamePrefs().getUserSaveDir(), "MainUI/resume.st");
     }
@@ -110,7 +122,11 @@ final class MainUIStates implements MainUIStateApi.Emulator {
         return best;
     }
 
-    /** Runs [start] and waits (30 s at most) for the core's save / load complete callback. */
+    /**
+     * Runs [start] and waits (30 s of running at most) for the core's save / load complete
+     * callback. The core does the job only while the game runs: time paused doesn't count, so a
+     * job held back by a pause is never given up on (and the slot put back under it).
+     */
     private void whenDone(boolean save, Runnable start) throws Exception {
         final int param = (save ? CoreTypes.m64p_core_param.M64CORE_STATE_SAVECOMPLETE : CoreTypes.m64p_core_param.M64CORE_STATE_LOADCOMPLETE).ordinal();
         final CountDownLatch done = new CountDownLatch(1);
@@ -121,7 +137,11 @@ final class MainUIStates implements MainUIStateApi.Emulator {
         core().addOnStateCallbackListener(l);
         try {
             start.run();
-            if (!done.await(30, TimeUnit.SECONDS)) throw new IllegalStateException("Mupen64Plus didn't finish " + (save ? "saving" : "loading"));
+            long waited = 0;
+            while (!done.await(250, TimeUnit.MILLISECONDS)) {
+                if (!isRunning()) throw new IllegalStateException("the game ended");
+                if (!service.isPaused() && (waited += 250) >= 30_000) throw new IllegalStateException("Mupen64Plus didn't finish " + (save ? "saving" : "loading"));
+            }
         } finally {
             core().removeOnStateCallbackListener(l);
         }
