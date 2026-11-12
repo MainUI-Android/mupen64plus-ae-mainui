@@ -62,6 +62,7 @@ final class MainUIStates implements MainUIStateApi.Emulator {
     @Override
     public void restoreOwnPause() {
         if (isRunning() && !service.isPaused()) service.pauseEmulator();
+        pausedByMainUi = false; // (the user's pause again, even if MainUI paused meanwhile)
     }
 
     private File resumeFile() {
